@@ -1,2 +1,1 @@
 # Win32Coop
-I GOT A DIG BICK
