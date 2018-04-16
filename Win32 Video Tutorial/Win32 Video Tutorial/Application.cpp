@@ -1,5 +1,5 @@
-#include TITTIES2.h
-#include TITTIES.h
+// #include TITTIES2.h	// These were commented for reasons
+// #include TITTIES.h	// titty reasons...
 #include <Windows.h>
 #include <tchar.h>
 
