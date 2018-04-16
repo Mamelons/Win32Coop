@@ -1,0 +1,3 @@
+﻿  Application.cpp
+c:\users\wdkoe\source\repos\win32 video tutorial\win32 video tutorial\application.cpp(113): warning C4715: 'WndProc': not all control paths return a value
+  Win32 Video Tutorial.vcxproj -> C:\Users\wdkoe\source\repos\Win32 Video Tutorial\Debug\Win32 Video Tutorial.exe
