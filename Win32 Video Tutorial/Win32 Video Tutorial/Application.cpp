@@ -1,102 +1,106 @@
 #include <Windows.h>
-#include <tchar.h>
+#include "resource.h"
 
-#define FILE_MENU_NEW 1		// All this does is assign an ID to UINT_PTR uiNewMenuItem
-#define FILE_MENU_OPEN 2	// in the AppendMenu() function.
-#define FILE_MENU_EXIT 3
+#define BTN1 1
+#define BTN2 2
+#define BTN3 3
+#define BTN4 4
+#define BTN5 5
+#define BTN6 6
+#define BTN7 7
+#define BTN8 8
+#define BTN9 9
+#define BTN0 0
 
-// HWND hWnd;  // Can either use this in the global scope or in local scope...
-// HMENU hMenu; // You can also keep this in the local scope of AddMenus(HWND);
 
-TCHAR szTitle[] = _T("Title");
-TCHAR szWinClass[] = _T("WindowClass");
 
-LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+const char szClassName[] = "Window Class 1";
 
-void AddMenus(HWND);
-void AddControls(HWND);
+LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
+void addControls(HWND);
 
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR cmdLine, int showCmd)
+HWND field;
+
+HWND btn1;
+HWND btn2;
+HWND btn3;
+HWND btn4;
+HWND btn5;
+HWND btn6;
+HWND btn7;
+HWND btn8;
+HWND btn9;
+HWND btn0;
+
+int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-	// STEP 1 --> Set up the window class (in this case, and most cases, it is WNDCLASSEX)
-
 	WNDCLASSEX wc;
-
-	wc.cbSize = sizeof(WNDCLASSEX);
-	wc.cbClsExtra = 0;
-	wc.cbWndExtra = 0;
-	wc.hIconSm = NULL;
-	wc.hInstance = hInstance;
-	wc.lpfnWndProc = WndProc;
-	wc.style = CS_HREDRAW | CS_VREDRAW;
-	wc.lpszClassName = szWinClass;
-	wc.lpszMenuName = NULL;
-	wc.hCursor = LoadCursor(NULL, IDC_PIN);
-	wc.hIcon = LoadIcon(NULL, IDI_WINLOGO);
-	wc.hbrBackground = (HBRUSH)(CreateSolidBrush(RGB(0, 0, 0)));
-
-	// STEP 2 --> Register the class with Windows OS. If registering fails, show error message.
-	RegisterClassEx(&wc);
-
-	if (!&wc)
-	{
-		MessageBoxA(NULL, "Call to RegisterClassEx failed!", "ERROR!", MB_ABORTRETRYIGNORE | MB_ICONERROR);
-		return -1;
-	}
-
-	// STEP 3 --> Create the window
-	HWND hWnd = CreateWindowEx(WS_EX_LEFTSCROLLBAR, szWinClass, szTitle, WS_OVERLAPPEDWINDOW | WS_VISIBLE, 100, 100, 500, 500, NULL, NULL, hInstance, NULL);
-
-	// STEP 4 --> Check to make sure the window was created. If not, show error message.
-	if (!hWnd)
-	{
-		MessageBoxA(NULL, "Call to CreateWindowEx failed!", "ERROR!", MB_OK | MB_ICONERROR);
-		return -1;
-	}
-
-	// STEP 5 --> Show the window and update it.
-	ShowWindow(hWnd, showCmd);
-	UpdateWindow(hWnd);
-
-	// STEP 6
+	HWND hWnd;
 	MSG msg;
 
-	SecureZeroMemory(&msg, sizeof(MSG));
-	
-	while (GetMessage(&msg, NULL, 0, 0))
+	wc.cbSize = sizeof(WNDCLASSEX);
+	wc.style = 0;
+	wc.lpfnWndProc = WndProc;
+	wc.cbClsExtra = 0;
+	wc.cbWndExtra = 0;
+	wc.hInstance = hInstance;
+	wc.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+	wc.hbrBackground = (HBRUSH)(CreateSolidBrush(RGB(30, 30, 30)));
+	wc.lpszMenuName = MAKEINTRESOURCE(IDR_MENU1);
+	wc.lpszClassName = szClassName;
+	wc.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
+
+	if (!RegisterClassEx(&wc))
+	{
+		MessageBox(NULL, "RegisterClass failed!", "ERROR!", MB_ICONEXCLAMATION | MB_OK);
+		return 0;
+	}
+
+	hWnd = CreateWindowEx(WS_EX_CLIENTEDGE, szClassName, "hWnd Top Level", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 300, 300, NULL, NULL, hInstance, NULL);
+
+	if (hWnd == NULL)
+	{
+		MessageBox(NULL, "CreateWindowEX failed!", "ERROR!", MB_ICONEXCLAMATION | MB_OK);
+		return 0;
+	}
+
+	ShowWindow(hWnd, nCmdShow);
+	UpdateWindow(hWnd);
+
+	while (GetMessage(&msg, NULL, 0, 0) > 0)
 	{
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}
-	return (int)msg.wParam;
+	return msg.wParam;
 }
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
 	{
-	case WM_COMMAND:
-		switch (wParam)
-		{
-		case 1:
-			MessageBeep(MB_OK);
-			break;
-		case FILE_MENU_EXIT:
-			MessageBeep(MB_ICONINFORMATION);
-			const int exit = MessageBox(hWnd, "Are you sure you want to quit?", "Exit", MB_YESNO);
-			switch (exit)
-			{
-			case IDYES:
-				DestroyWindow(hWnd);
-			case IDNO:
-				break;
-			default:
-				break;
-			}
-		}
 	case WM_CREATE:
-		AddMenus(hWnd);
-		AddControls(hWnd);
+		addControls(hWnd);
+		break;
+	case WM_COMMAND:
+		switch (LOWORD(wParam))
+		{
+		case ID_FILE_EXIT:
+			PostMessage(hWnd, WM_CLOSE, 0, 0);
+			break;
+		case ID_HELP_ABOUT:
+			break;
+		case 1:
+			MessageBox(hWnd, "1", "1", MB_OK);
+			break;
+		case 2:
+			MessageBox(hWnd, "2", "2", MB_OK);
+			break;
+		case 3:
+			MessageBox(hWnd, "3", "3", MB_OK);
+			break;
+		}
 		break;
 	case WM_CLOSE:
 		DestroyWindow(hWnd);
@@ -104,36 +108,46 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		break;
-	/*case WM_LBUTTONUP:
-		MessageBoxA(NULL, "Left Click", "Event", MB_OK);
-		break;*/
 	default:
 		return DefWindowProc(hWnd, msg, wParam, lParam);
 	}
+	return 0;
 }
 
-void AddMenus(HWND hWnd)
+void addControls(HWND hWnd) // next, try to add this in a for loop to get real crazy!!!
 {
-	HMENU hMenu = CreateMenu();
-	HMENU hFile = CreateMenu();
-	HMENU hSub = CreateMenu();
+	field = CreateWindow("static", "", WS_VISIBLE | WS_CHILD, 130, 50, 100, 20, hWnd, NULL, NULL, NULL);
 
-	AppendMenu(hSub, MF_STRING, NULL, "Open Recent");
+	btn1 = CreateWindow("button", "1", WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON, 10, 50, 20, 20, hWnd, (HMENU)BTN1, NULL, NULL);
+	btn2 = CreateWindow("button", "2", WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON, 35, 50, 20, 20, hWnd, (HMENU)BTN2, NULL, NULL);
+	btn3 = CreateWindow("button", "3", WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON, 60, 50, 20, 20, hWnd, (HMENU)BTN3, NULL, NULL);
 
-	AppendMenu(hFile, MF_POPUP, FILE_MENU_NEW, "New");
-	AppendMenu(hFile, MF_POPUP, (UINT_PTR)hSub, "Open");
-	AppendMenu(hFile, MF_SEPARATOR, NULL, NULL);
-	AppendMenu(hFile, MF_POPUP, FILE_MENU_EXIT, "Exit");
+	btn4 = CreateWindow("button", "4", WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON, 10, 75, 20, 20, hWnd, (HMENU)BTN4, NULL, NULL);
+	btn5 = CreateWindow("button", "5", WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON, 35, 75, 20, 20, hWnd, (HMENU)BTN5, NULL, NULL);
+	btn6 = CreateWindow("button", "6", WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON, 60, 75, 20, 20, hWnd, (HMENU)BTN6, NULL, NULL);
 
+	btn7 = CreateWindow("button", "7", WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON, 10, 100, 20, 20, hWnd, (HMENU)BTN7, NULL, NULL);
+	btn8 = CreateWindow("button", "8", WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON, 35, 100, 20, 20, hWnd, (HMENU)BTN8, NULL, NULL);
+	btn9 = CreateWindow("button", "9", WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON, 60, 100, 20, 20, hWnd, (HMENU)BTN9, NULL, NULL);
 
-	AppendMenu(hMenu, MF_POPUP, (UINT_PTR)hFile, "File");
-	AppendMenu(hMenu, MF_STRING, NULL, "Help");
-
-	SetMenu(hWnd, hMenu);
+	btn0 = CreateWindow("button", "0", WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON, 35, 125, 20, 20, hWnd, (HMENU)BTN0, NULL, NULL);
 }
 
-void AddControls(HWND hWnd) {
-	CreateWindow("Static", "Enter your text here: ", WS_VISIBLE | WS_CHILD | WS_BORDER | SS_CENTER, 100, 80, 100, 20, hWnd, NULL, NULL, NULL);
-	CreateWindow("edit", "Window Name", WS_VISIBLE | WS_CHILD | WS_BORDER | SS_CENTER, 100, 101, 100, 20, hWnd, NULL, NULL, NULL);
-	CreateWindowEx(NULL, _T("Edit"), _T("Window Name"), WS_VISIBLE | WS_CHILD | WS_BORDER | SS_CENTER, 100, 121, 100, 20, hWnd, NULL, NULL, NULL);
-}
+
+
+/*		---- WHAT TO ADD INTO THE PROGRAM NEXT ----
+	- Add grid controls for calculator in a for loop
+	- 
+
+
+
+
+
+	
+
+
+
+
+
+
+*/
